@@ -20,6 +20,9 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class DeepLPlugin extends PluginActivator implements DeepLService {
 
+    private static final String DEEPL_URL = "https://api-free.deepl.com/v2/";
+    private static final String DEEPL_AUTH_KEY = System.getProperty("dmx.deepl.auth_key");
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Logger logger = Logger.getLogger(getClass().getName());
