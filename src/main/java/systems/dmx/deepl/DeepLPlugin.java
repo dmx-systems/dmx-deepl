@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+// import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -53,8 +54,8 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             // Note: opening the output stream connects implicitly (no con.connect() required)
             // and sets method to "POST" automatically
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-            out.write("text=" + text + "&target_lang=" + targetLang);       // FIXME: urlencode?
-            out.flush();
+            out.write("text=" + text + "&target_lang=" + targetLang + "&tag_handling=xml");
+            out.flush();    // FIXME: URLEncoder.encode(text, "UTF-8")?
             String responseData = JavaUtils.readText(con.getInputStream());
             logger.info("responseData=" + responseData);
             // parse response
