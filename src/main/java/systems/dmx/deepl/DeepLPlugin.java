@@ -42,8 +42,6 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
 
     // *** DeepLService ***
 
-    @GET
-    @Path("/translate")
     @Override
     public List<Translation> translate(@QueryParam("text") String text, @QueryParam("target_lang") String targetLang) {
         try {
