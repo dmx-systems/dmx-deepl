@@ -12,7 +12,7 @@ public class Translation implements JSONEnabled {
 
     public Translation(String text, String detectedSourceLang) {
         this.text = text;
-        this.detectedSourceLang = detectedSourceLang;
+        this.detectedSourceLang = detectedSourceLang.toLowerCase();
     }
 
     // JSONEnabled
