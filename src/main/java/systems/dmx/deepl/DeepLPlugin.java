@@ -48,14 +48,17 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
     @Override
     public List<Translation> translate(@QueryParam("text") String text, @QueryParam("target_lang") String targetLang) {
         try {
-            logger.info("Translating text=\"" + text + "\", targetLang=\"" + targetLang + "\"");
+            StringBuilder stripped = new StringBuilder();
+            List<String> urls = stripImageURLs(text, stripped);
+            logger.info("Translating text (image URLs stripped): \"" + stripped + "\", targetLang=\"" + targetLang +
+                "\"");
             URLConnection con = new URL(DEEPL_URL + "translate").openConnection();
             con.setRequestProperty("Authorization", "DeepL-Auth-Key " + DEEPL_AUTH_KEY);
             con.setDoOutput(true);
             // Note: opening the output stream connects implicitly (no con.connect() required)
             // and sets method to "POST" automatically
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-            out.write("text=" + text + "&target_lang=" + targetLang + "&tag_handling=xml");
+            out.write("text=" + stripped + "&target_lang=" + targetLang + "&tag_handling=xml");
             out.flush();
             String responseData = JavaUtils.readText(con.getInputStream());
             logger.info("responseData=" + responseData);
@@ -65,14 +68,13 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             for (int i = 0; i < translations.length(); i++) {
                 JSONObject translation = translations.getJSONObject(i);
                 result.add(new Translation(
-                    repairTranslation(translation.getString("text"), text),
+                    insertImageURLs(translation.getString("text"), urls),
                     translation.getString("detected_source_language")
                 ));
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Translation failed, text=\"" + text + "\", targetLang=\"" + targetLang + "\"",
-                e);
+            throw new RuntimeException("Translation failed", e);
         }
     }
 
@@ -92,32 +94,34 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // Note: image tag data-urls are mangled by DeepL: '+' characters are (accidentally) stripped.
-    private String repairTranslation(String translation, String text) {
-        try {
-            StringBuilder repaired = new StringBuilder();
-            int ti = 0;
-            int ri = 0;
-            int t1;
-            int count = 0;
-            while ((t1 = text.indexOf(IMG_START, ti)) != -1) {
-                int t2 = text.indexOf(IMG_END, ti + IMG_START.length());
-                int r1 = translation.indexOf(IMG_START, ri);
-                int r2 = translation.indexOf(IMG_END, ri + IMG_START.length());
-                if (r1 == -1 || r2 == -1) {
-                    throw new RuntimeException("not found in translation");
-                }
-                repaired.append(translation.substring(ri, r1));
-                repaired.append(text.substring(t1, t2 + IMG_END.length()));
-                ti = t2 + IMG_END.length();
-                ri = r2 + IMG_END.length();
-                count++;
-            }
-            repaired.append(translation.substring(ri));
-            logger.info("Image URLs repaired: " + count);
-            return repaired.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Repairing image tags failed", e);
+    private List<String> stripImageURLs(String text, StringBuilder builder) {
+        List<String> urls = new ArrayList();
+        int t1;
+        int ti = 0;
+        while ((t1 = text.indexOf(IMG_START, ti)) != -1) {
+            int t2 = text.indexOf(IMG_END, ti + IMG_START.length());
+            String url = text.substring(t1 + IMG_START.length(), t2);
+            urls.add(url);
+            builder.append(text.substring(ti, t1 + IMG_START.length()));
+            builder.append(IMG_END);
+            ti = t2 + IMG_END.length();
         }
+        builder.append(text.substring(ti));
+        return urls;
+    }
+
+    private String insertImageURLs(String text, List<String> urls) {
+        StringBuilder inserted = new StringBuilder();
+        int t1;
+        int ti = 0;
+        int count = 0;
+        while ((t1 = text.indexOf(IMG_START, ti)) != -1) {
+            inserted.append(text.substring(ti, t1 + IMG_START.length()));
+            inserted.append(urls.get(count++));
+            inserted.append(IMG_END);
+            ti = t1 + IMG_START.length() + IMG_END.length();
+        }
+        inserted.append(text.substring(ti));
+        return inserted.toString();
     }
 }
