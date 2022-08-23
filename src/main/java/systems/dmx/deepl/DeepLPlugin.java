@@ -50,7 +50,8 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
         try {
             StringBuilder stripped = new StringBuilder();
             List<String> urls = stripImageURLs(text, stripped);
-            logger.info("Translating text (image URLs stripped): \"" + stripped + "\", targetLang=\"" + targetLang +
+            String _stripped = stripped.toString();
+            logger.info("Translating text (image URLs stripped): \"" + _stripped + "\", targetLang=\"" + targetLang +
                 "\"");
             URLConnection con = new URL(DEEPL_URL + "translate").openConnection();
             con.setRequestProperty("Authorization", "DeepL-Auth-Key " + DEEPL_AUTH_KEY);
@@ -58,7 +59,7 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             // Note: opening the output stream connects implicitly (no con.connect() required)
             // and sets method to "POST" automatically
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-            out.write("text=" + stripped + "&target_lang=" + targetLang + "&tag_handling=xml");
+            out.write("text=" + _stripped + "&target_lang=" + targetLang + "&tag_handling=xml");
             out.flush();
             String responseData = JavaUtils.readText(con.getInputStream());
             logger.info("responseData=" + responseData);
