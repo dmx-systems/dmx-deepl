@@ -7,10 +7,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
@@ -19,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
-// import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -59,7 +55,8 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             // Note: opening the output stream connects implicitly (no con.connect() required)
             // and sets method to "POST" automatically
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-            out.write("text=" + _stripped + "&target_lang=" + targetLang + "&tag_handling=xml");
+            out.write("text=" + JavaUtils.encodeURIComponent(_stripped) + "&target_lang=" + targetLang +
+                "&tag_handling=html");
             out.flush();
             String responseData = JavaUtils.readText(con.getInputStream());
             logger.info("responseData=" + responseData);
@@ -75,7 +72,7 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             }
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Translation failed", e);
+            throw new RuntimeException("DeepL translation failed", e);
         }
     }
 
@@ -89,7 +86,7 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             con.connect();
             return con.getInputStream();
         } catch (Exception e) {
-            throw new RuntimeException("Getting usage stats failed", e);
+            throw new RuntimeException("Getting DeepL usage stats failed", e);
         }
     }
 
