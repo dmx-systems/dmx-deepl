@@ -7,7 +7,7 @@
     <name>DMX DeepL</name>
     <groupId>systems.dmx</groupId>
     <artifactId>dmx-deepl</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>bundle</packaging>
 
     <description>The DeepL API as a DMX service</description>
@@ -15,7 +15,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.2.1</version>
+        <version>5.3</version>
     </parent>
 
     <build>

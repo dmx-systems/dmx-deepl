@@ -8,7 +8,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
@@ -42,7 +41,7 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
     // *** DeepLService ***
 
     @Override
-    public List<Translation> translate(@QueryParam("text") String text, @QueryParam("target_lang") String targetLang) {
+    public List<Translation> translate(String text, String targetLang) {
         try {
             StringBuilder stripped = new StringBuilder();
             List<String> urls = stripImageURLs(text, stripped);
@@ -52,8 +51,8 @@ public class DeepLPlugin extends PluginActivator implements DeepLService {
             URLConnection con = new URL(DEEPL_URL + "translate").openConnection();
             con.setRequestProperty("Authorization", "DeepL-Auth-Key " + DEEPL_AUTH_KEY);
             con.setDoOutput(true);
-            // Note: opening the output stream connects implicitly (no con.connect() required)
-            // and sets method to "POST" automatically
+            // Note: opening the output stream connects implicitly (no con.connect() required) and sets
+            // method ("POST") and Content-Type ("application/x-www-form-urlencoded") automatically
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write("text=" + JavaUtils.encodeURIComponent(_stripped) + "&target_lang=" + targetLang +
                 "&tag_handling=html");
