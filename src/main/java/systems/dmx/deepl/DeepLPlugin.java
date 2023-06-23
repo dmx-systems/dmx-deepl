@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 @Produces("application/json")
 public class DeepLPlugin extends PluginActivator implements DeepLService {
 
-    private static final String DEEPL_URL = System.getProperty("dmx.deepl.url", "https://api-free.deepl.com/v2/");
+    private static final String DEEPL_URL = System.getProperty("dmx.deepl.base_url", "https://api-free.deepl.com/v2/");
     private static final String DEEPL_AUTH_KEY = System.getProperty("dmx.deepl.auth_key");
 
     private static final String IMG_START = "<img src=\"";
