@@ -11,6 +11,10 @@ The [DeepL](https://www.deepl.com/) API as a [DMX platform](https://github.com/d
 
 ## Version History
 
+**1.0.1** -- Jun 23, 2023
+
+* Add `dmx.deepl.base_url` config property
+
 **1.0** -- Jun 16, 2023
 
 * 2 service calls:
