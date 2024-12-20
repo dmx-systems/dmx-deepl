@@ -15,7 +15,7 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.3</version>
+        <version>5.3.5-SNAPSHOT</version>
     </parent>
 
     <build>
